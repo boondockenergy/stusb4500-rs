@@ -1,7 +1,7 @@
 [package]
 name = "stusb4500"
 description = "STUSB4500 USB-PD Sink controller driver"
-version = "0.1.0"
+version = "0.1.0-beta"
 authors = ["Gustav Palmqvist <gustavp@gpa-robotics.com>"]
 edition = "2018"
 repository = "https://github.com/Atmelfan/stusb4500-rs"

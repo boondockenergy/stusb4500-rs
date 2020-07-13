@@ -10,8 +10,6 @@ use hal::blocking::i2c;
 pub mod pdo;
 pub mod rdo;
 pub mod registers;
-#[cfg(nvm_flash)]
-pub mod nvm;
 
 use pdo::*;
 use rdo::*;
