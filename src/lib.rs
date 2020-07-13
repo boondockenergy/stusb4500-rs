@@ -45,6 +45,7 @@ impl Default for Address {
     }
 }
 
+#[derive(Debug)]
 pub enum Error<I2C> {
     I2CError(I2C),
     InvalidPdo,
