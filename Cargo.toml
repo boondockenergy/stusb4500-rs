@@ -1,5 +1,5 @@
 [package]
-name = "stusb4500-rs"
+name = "stusb4500"
 description = "STUSB4500 USB-PD Sink controller driver"
 version = "0.1.0"
 authors = ["Gustav Palmqvist <gustavp@gpa-robotics.com>"]
