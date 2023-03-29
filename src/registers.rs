@@ -44,13 +44,17 @@ pub enum Register {
     RXDataObj = 0x33,//4 bytes
     TXHeaderL = 0x51,
     TXHeaderH = 0x52,
-    //0x53-0x6F, Reserved
+    RWBuffer = 0x53, // 8 bytes
+    //0x5B-0x6F, Reserved
     DPMPDONumb = 0x70,
     //0x71-0x84, Reserved
     DPMSNKPDO1 = 0x85,//4 bytes
     DPMSNKPDO2 = 0x89,//4 bytes
     DPMSNKPDO3 = 0x8D,//4 bytes
     RDORegStatus = 0x91,//4 bytes
+    NvmPassword = 0x95,
+    NvmCtrl0 = 0x96,
+    NvmCtrl1 = 0x97,
 }
 
 bitflags! {
@@ -78,4 +82,16 @@ bitflags! {
         const PDTypeCStatus         = 0b0000_1000;
         const PRTStatus             = 0b0000_0010;
     }
+}
+
+bitflags! {
+    pub struct NvmCtrl0: u8 {
+        const Power   = 0b1000_0000;
+        const Enable  = 0b0100_0000;
+        const Request = 0b0001_0000;
+    }
+}
+
+pub enum NvmCtrl1Opcode {
+    ReadSector = 0x00, // Read the sector data
 }
