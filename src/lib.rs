@@ -86,7 +86,7 @@ impl<I2C, E> STUSB4500<I2C>
 
     /// Get active interrupt flags
     pub fn get_alerts(&mut self) -> Result<Alert, Error<E>>{
-        Ok(Alert::from_masked_bits(self.read(Register::AlertStatus1)?))
+        Ok(Alert::from_bits_truncate(self.read(Register::AlertStatus1)?))
     }
 
     /// Perform a soft reset
