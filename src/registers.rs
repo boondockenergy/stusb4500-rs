@@ -77,18 +77,5 @@ bitflags! {
         const CCHWFaultStatus       = 0b0001_0000;
         const PDTypeCStatus         = 0b0000_1000;
         const PRTStatus             = 0b0000_0010;
-
-        const _Mask = Self::PortStatus.bits
-            | Self::TypeCMonitoringStatus.bits
-            | Self::CCHWFaultStatus.bits
-            | Self::PDTypeCStatus.bits
-            | Self::PRTStatus.bits;
-    }
-}
-
-impl Alert {
-    pub(crate) fn from_masked_bits(bits: u8) -> Alert {
-        // Mask to ignore reserved/undocumented bits
-        Self::from_bits(bits & Self::_Mask.bits).unwrap()
     }
 }
