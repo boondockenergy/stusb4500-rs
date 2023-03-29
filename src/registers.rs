@@ -92,6 +92,22 @@ bitflags! {
     }
 }
 
+bitflags! {
+    pub struct NvmCtrl1: u8 {
+        const EraseSector0 = 0b0000_1000;
+        const EraseSector1 = 0b0001_0000;
+        const EraseSector2 = 0b0010_0000;
+        const EraseSector3 = 0b0100_0000;
+        const EraseSector4 = 0b1000_0000;
+    }
+}
+
 pub enum NvmCtrl1Opcode {
     ReadSector = 0x00, // Read the sector data
+    LoadPlr = 0x01, // Load the Program Load Register
+    LoadSer = 0x02, // Load the Sector Erase Register
+    DumpPlr = 0x03, // Dump the Program Load Register
+    DumpSer = 0x04, // Dump the Sector Erase Register
+    EraseSectors = 0x05, // Erase the specified sectors
+    WriteSector = 0x06, // Program the sector data to EEPROM
 }
