@@ -64,7 +64,7 @@ bitflags! {
         const CCFaultStatus         = 0b0001_0000;
         const PRTStatus             = 0b0000_0010;
 
-        const _Default = Self::PortStatus.bits | Self::TypeCMonitoringStatus.bits | Self::PRTStatus.bits;
+        const _Default = Self::PortStatus.bits() | Self::TypeCMonitoringStatus.bits() | Self::PRTStatus.bits();
     }
 }
 

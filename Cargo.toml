@@ -1,9 +1,9 @@
 [package]
 name = "stusb4500"
 description = "STUSB4500 USB-PD Sink controller driver"
-version = "0.1.0-beta"
+version = "0.1.0"
 authors = ["Gustav Palmqvist <gustavp@gpa-robotics.com>"]
-edition = "2018"
+edition = "2021"
 homepage = "https://github.com/Atmelfan/stusb4500-rs"
 repository = "https://github.com/Atmelfan/stusb4500-rs"
 license = "MIT/Apache-2.0"
@@ -15,10 +15,10 @@ keywords = ["no-std", "embedded-hal", "driver", "usb", "usb-pd"]
 
 [dependencies]
 byteorder = {version = "1.2.1", default-features = false}
-bitflags = "1.2"
-bitfield = "0.13.2"
+bitflags = "2.0"
+bitfield = "0.14"
 embedded-hal = "0.2"
 
 [dev-dependencies]
-linux-embedded-hal = "0.2"
-embedded-hal-mock = "0.4"
+linux-embedded-hal = "0.3"
+embedded-hal-mock = "0.9"
