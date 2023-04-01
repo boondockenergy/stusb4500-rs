@@ -5,7 +5,7 @@ pub enum FastSwapSupport {
     NotSupported = 0,
     DefaultUsb = 1,
     _1A5_5V = 2,
-    _3A0_5V = 3
+    _3A0_5V = 3,
 }
 
 impl Default for FastSwapSupport {
@@ -27,7 +27,7 @@ impl Into<u32> for FastSwapSupport {
 
 const PDO_SNK_FIXED: u32 = 0x0 << 30;
 
-bitfield!{
+bitfield! {
     pub struct FixedPdo(u32);
     impl Debug;
     // The fields default to u16
@@ -59,7 +59,7 @@ impl FixedPdo {
 }
 
 const PDO_SNK_VARIABLE: u32 = 0x1 << 30;
-bitfield!{
+bitfield! {
     pub struct VariablePdo(u32);
     impl Debug;
     // The fields default to u16
@@ -76,7 +76,7 @@ impl Default for VariablePdo {
 }
 
 const PDO_SNK_BATTERY: u32 = 0x2 << 30;
-bitfield!{
+bitfield! {
     pub struct BatteryPdo(u32);
     impl Debug;
     // The fields default to u16
@@ -94,10 +94,9 @@ impl Default for BatteryPdo {
 pub enum Pdo {
     Fixed(FixedPdo),
     Variable(VariablePdo),
-    Battery(BatteryPdo)
+    Battery(BatteryPdo),
 }
 impl Pdo {
-
     pub fn new_fixed(voltage: u16, current: u16) -> Self {
         Pdo::Fixed(FixedPdo::new(voltage, current))
     }
@@ -141,7 +140,7 @@ impl Pdo {
         match self {
             Pdo::Fixed(a) => a.0,
             Pdo::Variable(a) => a.0,
-            Pdo::Battery(a) => a.0
+            Pdo::Battery(a) => a.0,
         }
     }
 
@@ -150,16 +149,7 @@ impl Pdo {
             PDO_SNK_FIXED => Some(Pdo::Fixed(FixedPdo(bits))),
             PDO_SNK_VARIABLE => Some(Pdo::Variable(VariablePdo(bits))),
             PDO_SNK_BATTERY => Some(Pdo::Battery(BatteryPdo(bits))),
-            _ => None
+            _ => None,
         }
     }
-
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::pdo::{Pdo};
-
-
-
 }

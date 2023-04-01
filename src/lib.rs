@@ -1,7 +1,7 @@
 #![no_std]
 
-extern crate byteorder;
 extern crate bitflags;
+extern crate byteorder;
 extern crate embedded_hal as hal;
 
 use byteorder::{ByteOrder, LittleEndian};
@@ -24,7 +24,7 @@ pub enum Address {
     /// Address determined by A1 and A0 pins. True = tied high, low = tied low.
     Strap(bool, bool),
     /// Custom address from config file etc
-    Custom(u8)
+    Custom(u8),
 }
 
 impl Address {
@@ -47,46 +47,53 @@ impl Default for Address {
 pub enum Error<I2C> {
     I2CError(I2C),
     InvalidPdo,
-    OutaRangePdo
+    OutaRangePdo,
 }
 
 pub enum PdoChannel {
     PDO1,
     PDO2,
-    PDO3
+    PDO3,
 }
 
 pub struct STUSB4500<I2C> {
     i2c: I2C,
-    address: u8
+    address: u8,
 }
 
 impl<I2C, E> STUSB4500<I2C>
-    where I2C: i2c::Write<Error = E> + i2c::Read<Error = E> {
-
+where
+    I2C: i2c::Write<Error = E> + i2c::Read<Error = E>,
+{
     pub fn new(i2c: I2C, address: Address) -> Self {
         STUSB4500 {
             i2c,
-            address: address.addr()
+            address: address.addr(),
         }
     }
 
     /// Read all interrupt registers to clear them
-    pub fn clear_interrupts(&mut self) -> Result<(), Error<E>>{
+    pub fn clear_interrupts(&mut self) -> Result<(), Error<E>> {
         // Read all interrupt registers
         let mut _buf = [0x00; 10];
-        self.i2c.write(self.address, &[Register::PortStatus0 as u8]).map_err(|err| Error::I2CError(err))?;
-        self.i2c.read(self.address, &mut _buf).map_err(|err| Error::I2CError(err))
+        self.i2c
+            .write(self.address, &[Register::PortStatus0 as u8])
+            .map_err(|err| Error::I2CError(err))?;
+        self.i2c
+            .read(self.address, &mut _buf)
+            .map_err(|err| Error::I2CError(err))
     }
 
     /// Set interrupt mask
-    pub fn set_alerts_mask(&mut self, alerts: AlertMask) -> Result<(), Error<E>>{
+    pub fn set_alerts_mask(&mut self, alerts: AlertMask) -> Result<(), Error<E>> {
         self.write(Register::AlertStatus1Mask, alerts.bits())
     }
 
     /// Get active interrupt flags
-    pub fn get_alerts(&mut self) -> Result<Alert, Error<E>>{
-        Ok(Alert::from_bits_truncate(self.read(Register::AlertStatus1)?))
+    pub fn get_alerts(&mut self) -> Result<Alert, Error<E>> {
+        Ok(Alert::from_bits_truncate(
+            self.read(Register::AlertStatus1)?,
+        ))
     }
 
     /// Perform a soft reset
@@ -98,36 +105,38 @@ impl<I2C, E> STUSB4500<I2C>
     }
 
     pub fn set_pdo(&mut self, pdo: PdoChannel, data: &Pdo) -> Result<(), Error<E>> {
-        if let Pdo::Fixed {..} = data {
-            self.write_word(match pdo {
-                PdoChannel::PDO1 => Register::DPMSNKPDO1,
-                PdoChannel::PDO2 => Register::DPMSNKPDO2,
-                PdoChannel::PDO3 => Register::DPMSNKPDO3,
-            }, data.bits())
-        }else{
+        if let Pdo::Fixed { .. } = data {
+            self.write_word(
+                match pdo {
+                    PdoChannel::PDO1 => Register::DPMSNKPDO1,
+                    PdoChannel::PDO2 => Register::DPMSNKPDO2,
+                    PdoChannel::PDO3 => Register::DPMSNKPDO3,
+                },
+                data.bits(),
+            )
+        } else {
             // Can only advertise fixed PDOs
             Err(Error::InvalidPdo)
         }
     }
-    
+
     pub fn get_pdo(&mut self, pdo: PdoChannel) -> Result<Pdo, Error<E>> {
         Pdo::from_bits(self.read_word(match pdo {
             PdoChannel::PDO1 => Register::DPMSNKPDO1,
             PdoChannel::PDO2 => Register::DPMSNKPDO2,
             PdoChannel::PDO3 => Register::DPMSNKPDO3,
-        })?).ok_or(Error::InvalidPdo)
+        })?)
+        .ok_or(Error::InvalidPdo)
     }
 
-    pub fn get_current_rdo(&mut self) -> Result<Rdo, Error<E>>{
+    pub fn get_current_rdo(&mut self) -> Result<Rdo, Error<E>> {
         Ok(Rdo(self.read_word(Register::RDORegStatus)?))
     }
 
-    pub fn set_num_pdo(&mut self, num: u8) -> Result<(), Error<E>>{
+    pub fn set_num_pdo(&mut self, num: u8) -> Result<(), Error<E>> {
         match num {
-            1..=3 => {
-                self.write(Register::DPMPDONumb, num)
-            },
-            _ => Err(Error::OutaRangePdo)
+            1..=3 => self.write(Register::DPMPDONumb, num),
+            _ => Err(Error::OutaRangePdo),
         }
     }
 
@@ -142,7 +151,9 @@ impl<I2C, E> STUSB4500<I2C>
     /// Write a byte register
     pub(crate) fn write(&mut self, register: Register, value: u8) -> Result<(), Error<E>> {
         let buf = [register as u8, value];
-        self.i2c.write(self.address, &buf).map_err(|err| Error::I2CError(err))
+        self.i2c
+            .write(self.address, &buf)
+            .map_err(|err| Error::I2CError(err))
     }
 
     /// Write a word register
@@ -150,25 +161,34 @@ impl<I2C, E> STUSB4500<I2C>
         let mut buf = [0x00; 5];
         buf[0] = register as u8;
         LittleEndian::write_u32(&mut buf[1..], word);
-        self.i2c.write(self.address, &buf).map_err(|err| Error::I2CError(err))
+        self.i2c
+            .write(self.address, &buf)
+            .map_err(|err| Error::I2CError(err))
     }
 
     /// Read a byte register
     pub(crate) fn read(&mut self, register: Register) -> Result<u8, Error<E>> {
         let mut buf = [0x00; 1];
-        self.i2c.write(self.address, &[register as u8]).map_err(|err| Error::I2CError(err))?;
-        self.i2c.read(self.address, &mut buf).map_err(|err| Error::I2CError(err))?;
+        self.i2c
+            .write(self.address, &[register as u8])
+            .map_err(|err| Error::I2CError(err))?;
+        self.i2c
+            .read(self.address, &mut buf)
+            .map_err(|err| Error::I2CError(err))?;
         Ok(buf[0])
     }
 
     /// Read a word register
     pub(crate) fn read_word(&mut self, register: Register) -> Result<u32, Error<E>> {
         let mut buf = [0x00; 4];
-        self.i2c.write(self.address, &[register as u8]).map_err(|err| Error::I2CError(err))?;
-        self.i2c.read(self.address, &mut buf).map_err(|err| Error::I2CError(err))?;
+        self.i2c
+            .write(self.address, &[register as u8])
+            .map_err(|err| Error::I2CError(err))?;
+        self.i2c
+            .read(self.address, &mut buf)
+            .map_err(|err| Error::I2CError(err))?;
         Ok(LittleEndian::read_u32(&buf))
     }
-
 }
 
 pub struct STUSB4500Nvm<'a, I2C> {
@@ -176,21 +196,26 @@ pub struct STUSB4500Nvm<'a, I2C> {
 }
 
 impl<I2C, E> STUSB4500Nvm<'_, I2C>
-    where I2C: i2c::Write<Error = E> + i2c::Read<Error = E> {
-
+where
+    I2C: i2c::Write<Error = E> + i2c::Read<Error = E>,
+{
     const DEFAULT_PASSWORD: u8 = 0x47;
 
     pub(crate) fn unlock(inner: &mut STUSB4500<I2C>) -> Result<STUSB4500Nvm<I2C>, Error<E>> {
         inner.write(Register::NvmPassword, STUSB4500Nvm::<I2C>::DEFAULT_PASSWORD)?;
         inner.write(Register::NvmCtrl0, 0x00)?;
-        inner.write(Register::NvmCtrl0, (NvmCtrl0::Power | NvmCtrl0::Enable).bits())?;
+        inner.write(
+            Register::NvmCtrl0,
+            (NvmCtrl0::Power | NvmCtrl0::Enable).bits(),
+        )?;
 
         Ok(STUSB4500Nvm { inner })
     }
 
     /// Lock the NVM
     pub fn lock(self) -> Result<(), Error<E>> {
-        self.inner.write(Register::NvmCtrl0, NvmCtrl0::Enable.bits())?;
+        self.inner
+            .write(Register::NvmCtrl0, NvmCtrl0::Enable.bits())?;
         self.inner.write(Register::NvmCtrl1, 0x00)?;
         self.inner.write(Register::NvmPassword, 0x00)
     }
@@ -228,23 +253,32 @@ impl<I2C, E> STUSB4500Nvm<'_, I2C>
     }
 
     fn issue_request_with_sector(&mut self, sector: u8) -> Result<(), Error<E>> {
-        self.inner.write(Register::NvmCtrl0, sector |
-            (NvmCtrl0::Power | NvmCtrl0::Enable | NvmCtrl0::Request).bits())?;
+        self.inner.write(
+            Register::NvmCtrl0,
+            sector | (NvmCtrl0::Power | NvmCtrl0::Enable | NvmCtrl0::Request).bits(),
+        )?;
 
         while NvmCtrl0::from_bits_truncate(self.inner.read(Register::NvmCtrl0)?)
-            .contains(NvmCtrl0::Request) {}
+            .contains(NvmCtrl0::Request)
+        {}
 
         Ok(())
     }
 
     fn read_sector(&mut self, sector: u8) -> Result<[u8; 8], Error<E>> {
-        self.inner.write(Register::NvmCtrl1, NvmCtrl1Opcode::ReadSector as u8)?;
+        self.inner
+            .write(Register::NvmCtrl1, NvmCtrl1Opcode::ReadSector as u8)?;
         self.issue_request_with_sector(sector)?;
 
         let mut buf = [0x00; 8];
-        self.inner.i2c.write(self.inner.address, &[Register::RWBuffer as u8])
+        self.inner
+            .i2c
+            .write(self.inner.address, &[Register::RWBuffer as u8])
             .map_err(|err| Error::I2CError(err))?;
-        self.inner.i2c.read(self.inner.address, &mut buf).map_err(|err| Error::I2CError(err))?;
+        self.inner
+            .i2c
+            .read(self.inner.address, &mut buf)
+            .map_err(|err| Error::I2CError(err))?;
         Ok(buf)
     }
 
@@ -253,32 +287,34 @@ impl<I2C, E> STUSB4500Nvm<'_, I2C>
         buf[0] = Register::RWBuffer as u8;
         buf[1..].copy_from_slice(data);
 
-        self.inner.i2c.write(self.inner.address, &buf).map_err(|err| Error::I2CError(err))?;
-        self.inner.write(Register::NvmCtrl1, NvmCtrl1Opcode::LoadPlr as u8)?;
+        self.inner
+            .i2c
+            .write(self.inner.address, &buf)
+            .map_err(|err| Error::I2CError(err))?;
+        self.inner
+            .write(Register::NvmCtrl1, NvmCtrl1Opcode::LoadPlr as u8)?;
         self.issue_request()?;
 
-        self.inner.write(Register::NvmCtrl1, NvmCtrl1Opcode::WriteSector as u8)?;
+        self.inner
+            .write(Register::NvmCtrl1, NvmCtrl1Opcode::WriteSector as u8)?;
         self.issue_request_with_sector(sector)
     }
 
     fn erase_sectors(&mut self) -> Result<(), Error<E>> {
-        self.inner.write(Register::NvmCtrl1, NvmCtrl1Opcode::LoadSer as u8 |
-            (NvmCtrl1::EraseSector0 |
-             NvmCtrl1::EraseSector1 |
-             NvmCtrl1::EraseSector2 |
-             NvmCtrl1::EraseSector3 |
-             NvmCtrl1::EraseSector4).bits())?;
+        self.inner.write(
+            Register::NvmCtrl1,
+            NvmCtrl1Opcode::LoadSer as u8
+                | (NvmCtrl1::EraseSector0
+                    | NvmCtrl1::EraseSector1
+                    | NvmCtrl1::EraseSector2
+                    | NvmCtrl1::EraseSector3
+                    | NvmCtrl1::EraseSector4)
+                    .bits(),
+        )?;
         self.issue_request()?;
 
-        self.inner.write(Register::NvmCtrl1, NvmCtrl1Opcode::EraseSectors as u8)?;
+        self.inner
+            .write(Register::NvmCtrl1, NvmCtrl1Opcode::EraseSectors as u8)?;
         self.issue_request()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }

@@ -41,17 +41,17 @@ pub enum Register {
     //0x30, Reserved
     RXHeaderL = 0x31,
     RXHeaderH = 0x32,
-    RXDataObj = 0x33,//4 bytes
+    RXDataObj = 0x33, //4 bytes
     TXHeaderL = 0x51,
     TXHeaderH = 0x52,
     RWBuffer = 0x53, // 8 bytes
     //0x5B-0x6F, Reserved
     DPMPDONumb = 0x70,
     //0x71-0x84, Reserved
-    DPMSNKPDO1 = 0x85,//4 bytes
-    DPMSNKPDO2 = 0x89,//4 bytes
-    DPMSNKPDO3 = 0x8D,//4 bytes
-    RDORegStatus = 0x91,//4 bytes
+    DPMSNKPDO1 = 0x85,   //4 bytes
+    DPMSNKPDO2 = 0x89,   //4 bytes
+    DPMSNKPDO3 = 0x8D,   //4 bytes
+    RDORegStatus = 0x91, //4 bytes
     NvmPassword = 0x95,
     NvmCtrl0 = 0x96,
     NvmCtrl1 = 0x97,
@@ -103,11 +103,11 @@ bitflags! {
 }
 
 pub enum NvmCtrl1Opcode {
-    ReadSector = 0x00, // Read the sector data
-    LoadPlr = 0x01, // Load the Program Load Register
-    LoadSer = 0x02, // Load the Sector Erase Register
-    DumpPlr = 0x03, // Dump the Program Load Register
-    DumpSer = 0x04, // Dump the Sector Erase Register
+    ReadSector = 0x00,   // Read the sector data
+    LoadPlr = 0x01,      // Load the Program Load Register
+    LoadSer = 0x02,      // Load the Sector Erase Register
+    DumpPlr = 0x03,      // Dump the Program Load Register
+    DumpSer = 0x04,      // Dump the Sector Erase Register
     EraseSectors = 0x05, // Erase the specified sectors
-    WriteSector = 0x06, // Program the sector data to EEPROM
+    WriteSector = 0x06,  // Program the sector data to EEPROM
 }

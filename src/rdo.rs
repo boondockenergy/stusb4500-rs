@@ -1,6 +1,6 @@
 use bitfield::bitfield;
 
-bitfield!{
+bitfield! {
   pub struct Rdo(u32);
   impl Debug;
   // The fields default to u16
@@ -14,7 +14,3 @@ bitfield!{
   pub max_operating_current, _: 9, 0;
 
 }
-
-
-
-
