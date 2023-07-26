@@ -96,6 +96,36 @@ where
         ))
     }
 
+    pub fn get_portstatus0(&mut self) -> Result<PortStatus0, Error<E>> {
+        Ok(PortStatus0::from_bits_truncate(
+            self.read(Register::PortStatus0)?,
+        ))
+    }
+
+    pub fn get_portstatus1(&mut self) -> Result<PortStatus1, Error<E>> {
+        Ok(PortStatus1::from_bits_truncate(
+            self.read(Register::PortStatus1)?,
+        ))
+    }
+
+    pub fn get_typec_monitoring_status0(&mut self) -> Result<TypeCMonitoringStatus0, Error<E>> {
+        Ok(TypeCMonitoringStatus0::from_bits_truncate(
+            self.read(Register::TypeCMonitoringStatus0)?,
+        ))
+    }
+
+    pub fn get_typec_monitoring_status1(&mut self) -> Result<TypeCMonitoringStatus1, Error<E>> {
+        Ok(TypeCMonitoringStatus1::from_bits_truncate(
+            self.read(Register::TypeCMonitoringStatus1)?,
+        ))
+    }
+
+    pub fn get_prt_status(&mut self) -> Result<PrtStatus, Error<E>> {
+        Ok(PrtStatus::from_bits_truncate(
+            self.read(Register::PRTStatus)?,
+        ))
+    }
+
     /// Perform a soft reset
     /// Triggers re-negotiation of PDO's.
     pub fn soft_reset(&mut self) -> Result<(), Error<E>> {

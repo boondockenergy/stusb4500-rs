@@ -75,12 +75,59 @@ impl Default for AlertMask {
 }
 
 bitflags! {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
     pub struct Alert: u8 {
         const PortStatus            = 0b0100_0000;
         const TypeCMonitoringStatus = 0b0010_0000;
         const CCHWFaultStatus       = 0b0001_0000;
         const PDTypeCStatus         = 0b0000_1000;
         const PRTStatus             = 0b0000_0010;
+    }
+}
+
+bitflags! {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+    pub struct PortStatus0: u8 {
+        const AttachTrans           = 0b0000_0001;
+    } 
+}
+
+bitflags! {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+    pub struct PortStatus1: u8 {
+        const SinkAttached          = 0b0010_0000;
+        const DebugAttached         = 0b0110_0000;
+        const SinkingPower          = 0b0000_1000;
+        const DataModeUFP           = 0b0000_0100;
+        const Attached              = 0b0000_0001;
+    }
+}
+
+bitflags! {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+    pub struct TypeCMonitoringStatus0: u8 {
+        const VbusHighStatus        = 0b0010_0000;
+        const VbusLowStatus         = 0b0001_0000;
+        const VbusReadyTrans        = 0b0000_1000;
+        const VbusVsafe0VTrans      = 0b0000_0100;
+        const VbusValidSnkTrans     = 0b0000_0010;
+    }
+}
+
+bitflags! {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+    pub struct TypeCMonitoringStatus1: u8 {
+        const VbusReady             = 0b0000_1000;
+        const VbusVsafe0V           = 0b0000_0100;
+        const VbusValidSnk          = 0b0000_0010;
+    }
+}
+
+bitflags! {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+    pub struct PrtStatus: u8 {
+        const PrlMessageReceived    = 0b0000_0100;
+        const PrlHwResetReceived    = 0b0000_0010;
     }
 }
 
